@@ -226,13 +226,18 @@ func (p *Interp) Run(code string) error {
 	// moments where Python's internal machinery expects a frame.
 	// When that happens CPython prints the error as an unraisable
 	// exception, clearing the error indicator, and PyRun_SimpleString
-	// still returns -1. Retry once after draining pending signals so
-	// callers do not see a spurious "error indicator not set" error.
+	// still returns -1. Retry once after draining any pending signal
+	// so callers do not see a spurious "error indicator not set"
+	// error. PyErr_CheckSignals can itself set an error (e.g. a
+	// KeyboardInterrupt); clear it before retrying so the second run
+	// starts from a clean slate and later tests do not inherit
+	// leftover exception state.
 	if C.PyRun_SimpleString(ccode) == 0 {
 		return nil
 	}
 	if C.PyErr_Occurred() == nil {
 		C.PyErr_CheckSignals()
+		C.PyErr_Clear()
 		if C.PyRun_SimpleString(ccode) == 0 {
 			return nil
 		}
@@ -273,9 +278,12 @@ func (p *Interp) Eval(expr string) (*Object, error) {
 		return newObject((*PyObject)(result)), nil
 	}
 	// Same signal-race mitigation as Run: retry once if the indicator
-	// was cleared by an unraisable print.
+	// was cleared by an unraisable print. CheckSignals may itself set
+	// an error; clear before retrying so subsequent tests do not
+	// inherit leftover exception state.
 	if C.PyErr_Occurred() == nil {
 		C.PyErr_CheckSignals()
+		C.PyErr_Clear()
 		result = C.PyRun_String(cexpr, C.Py_eval_input, globals, globals)
 		if result != nil {
 			return newObject((*PyObject)(result)), nil
