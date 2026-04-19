@@ -14,7 +14,7 @@ import (
 )
 
 func TestAttrString(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	sys := PyImport_ImportModule("sys")
 	defer sys.DecRef()
@@ -33,7 +33,7 @@ func TestAttrString(t *testing.T) {
 }
 
 func TestAttr(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	name := PyUnicode_FromString("stdout")
 	defer name.DecRef()
@@ -54,7 +54,7 @@ func TestAttr(t *testing.T) {
 }
 
 func TestRichCompareBool(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	s1 := PyUnicode_FromString("test1")
 	s2 := PyUnicode_FromString("test2")
@@ -66,7 +66,7 @@ func TestRichCompareBool(t *testing.T) {
 }
 
 func TestRichCompare(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	s1 := PyUnicode_FromString("test1")
 	s2 := PyUnicode_FromString("test2")
@@ -82,7 +82,7 @@ func TestRichCompare(t *testing.T) {
 }
 
 func TestRepr(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	list := PyList_New(0)
 	defer list.DecRef()
@@ -93,7 +93,7 @@ func TestRepr(t *testing.T) {
 }
 
 func TestStr(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	list := PyList_New(0)
 	defer list.DecRef()
@@ -104,7 +104,7 @@ func TestStr(t *testing.T) {
 }
 
 func TestASCII(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	list := PyList_New(0)
 	defer list.DecRef()
@@ -115,7 +115,7 @@ func TestASCII(t *testing.T) {
 }
 
 func TestCallable(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	builtins := PyEval_GetBuiltins()
 	assert.True(t, PyDict_Check(builtins))
@@ -150,7 +150,7 @@ func TestCallable(t *testing.T) {
 }
 
 func TestCallMethod(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	s := PyUnicode_FromString("hello world")
 	assert.True(t, PyUnicode_Check(s))
@@ -194,7 +194,7 @@ func TestCallMethod(t *testing.T) {
 }
 
 func TestIsTrue(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	b := Py_True.IsTrue() != 0
 	assert.True(t, b)
@@ -204,7 +204,7 @@ func TestIsTrue(t *testing.T) {
 }
 
 func TestNot(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	b := Py_True.Not() != 0
 	assert.False(t, b)
@@ -214,7 +214,7 @@ func TestNot(t *testing.T) {
 }
 
 func TestLength(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	length := 6
 
 	list := PyList_New(length)
@@ -226,7 +226,7 @@ func TestLength(t *testing.T) {
 }
 
 func TestLengthHint(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	length := 6
 
 	list := PyList_New(length)
@@ -238,7 +238,7 @@ func TestLengthHint(t *testing.T) {
 }
 
 func TestObjectItem(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	key := PyUnicode_FromString("key")
 	defer key.DecRef()
@@ -258,7 +258,7 @@ func TestObjectItem(t *testing.T) {
 }
 
 func TestDir(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	list := PyList_New(0)
 	defer list.DecRef()
@@ -280,7 +280,7 @@ func TestDir(t *testing.T) {
 }
 
 func TestReprEnterLeave(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	s := PyUnicode_FromString("hello world")
 	defer s.DecRef()
@@ -294,14 +294,14 @@ func TestReprEnterLeave(t *testing.T) {
 }
 
 func TestIsSubclass(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	assert.Equal(t, 1, PyExc_Warning.IsSubclass(PyExc_Exception))
 	assert.Equal(t, 0, Bool.IsSubclass(Float))
 }
 
 func TestHash(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	s := PyUnicode_FromString("test string")
 	defer s.DecRef()
@@ -310,7 +310,7 @@ func TestHash(t *testing.T) {
 }
 
 func TestObjectType(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	i := PyLong_FromGoInt(23543)
 	defer i.DecRef()
@@ -319,7 +319,7 @@ func TestObjectType(t *testing.T) {
 }
 
 func TestHashNotImplemented(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	s := PyUnicode_FromString("test string")
 	defer s.DecRef()
@@ -332,7 +332,7 @@ func TestHashNotImplemented(t *testing.T) {
 }
 
 func TestObjectIter(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	i := PyLong_FromGoInt(23)
 	defer i.DecRef()

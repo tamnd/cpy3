@@ -7,7 +7,7 @@ import (
 )
 
 func TestExceptionNew(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	exc := PyErr_NewException("test_module.TestException", nil, nil)
 	assert.NotNil(t, exc)
@@ -15,7 +15,7 @@ func TestExceptionNew(t *testing.T) {
 }
 
 func TestExceptionNewDoc(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	exc := PyErr_NewExceptionWithDoc("test_module.TestException", "docstring", nil, nil)
 	assert.NotNil(t, exc)
@@ -23,7 +23,7 @@ func TestExceptionNewDoc(t *testing.T) {
 }
 
 func TestExceptionContext(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	exc := PyErr_NewException("test_module.TestException", nil, nil)
 	assert.NotNil(t, exc)

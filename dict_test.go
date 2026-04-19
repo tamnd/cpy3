@@ -14,7 +14,7 @@ import (
 )
 
 func TestDict(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	dict := PyDict_New()
 	assert.True(t, PyDict_Check(dict))

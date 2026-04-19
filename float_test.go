@@ -15,7 +15,7 @@ import (
 )
 
 func TestPyFloatCheck(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	pyFloat := PyFloat_FromDouble(345.)
 	assert.True(t, PyFloat_Check(pyFloat))
@@ -24,7 +24,7 @@ func TestPyFloatCheck(t *testing.T) {
 }
 
 func TestPyFloatFromAsDouble(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	v := 2354.
 	pyFloat := PyFloat_FromDouble(v)
 	assert.NotNil(t, pyFloat)
@@ -33,7 +33,7 @@ func TestPyFloatFromAsDouble(t *testing.T) {
 }
 
 func TestPyFloatFromAsString(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	pyString := PyUnicode_FromString("2354")
 	defer pyString.DecRef()
 
@@ -44,7 +44,7 @@ func TestPyFloatFromAsString(t *testing.T) {
 }
 
 func TestPyFloatMinMax(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	assert.Equal(t, math.MaxFloat64, PyFloat_GetMax())
 
@@ -52,7 +52,7 @@ func TestPyFloatMinMax(t *testing.T) {
 }
 
 func TestPyFloatInfo(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	assert.NotNil(t, PyFloat_GetInfo())
 }

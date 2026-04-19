@@ -7,7 +7,7 @@ import (
 )
 
 func TestErrorSetString(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	PyErr_SetString(PyExc_BaseException, "test message")
 
@@ -17,7 +17,7 @@ func TestErrorSetString(t *testing.T) {
 }
 
 func TestErrorSetObject(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	message := PyUnicode_FromString("test message")
 	defer message.DecRef()
@@ -30,7 +30,7 @@ func TestErrorSetObject(t *testing.T) {
 }
 
 func TestErrorSetNone(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	message := PyUnicode_FromString("test message")
 	defer message.DecRef()
@@ -43,7 +43,7 @@ func TestErrorSetNone(t *testing.T) {
 }
 
 func TestErrorSetObjectEx(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	message := PyUnicode_FromString("test message")
 	defer message.DecRef()
@@ -56,7 +56,7 @@ func TestErrorSetObjectEx(t *testing.T) {
 }
 
 func TestErrorWriteUnraisable(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	message := PyUnicode_FromString("unraisable exception")
 	defer message.DecRef()
@@ -67,7 +67,7 @@ func TestErrorWriteUnraisable(t *testing.T) {
 }
 
 func TestErrorBadArgument(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	PyErr_BadArgument()
 
@@ -79,7 +79,7 @@ func TestErrorBadArgument(t *testing.T) {
 }
 
 func TestErrorNoMemory(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	PyErr_NoMemory()
 
@@ -89,7 +89,7 @@ func TestErrorNoMemory(t *testing.T) {
 }
 
 func TestErrorBadInternalCall(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	PyErr_BadInternalCall()
 
@@ -99,7 +99,7 @@ func TestErrorBadInternalCall(t *testing.T) {
 }
 
 func TestErrorImportError(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	message := PyUnicode_FromString("test message")
 	defer message.DecRef()
@@ -112,7 +112,7 @@ func TestErrorImportError(t *testing.T) {
 }
 
 func TestErrorImportErrorSubclass(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	message := PyUnicode_FromString("test message")
 	defer message.DecRef()
@@ -125,7 +125,7 @@ func TestErrorImportErrorSubclass(t *testing.T) {
 }
 
 func TestErrorSyntax(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	PyErr_SetNone(PyExc_SyntaxError)
 
@@ -138,7 +138,7 @@ func TestErrorSyntax(t *testing.T) {
 }
 
 func TestErrorSyntaxEx(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	PyErr_SetNone(PyExc_SyntaxError)
 
@@ -151,7 +151,7 @@ func TestErrorSyntaxEx(t *testing.T) {
 }
 
 func TestErrorSyntaxLocation(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	PyErr_SetNone(PyExc_SyntaxError)
 
@@ -166,7 +166,7 @@ func TestErrorSyntaxLocation(t *testing.T) {
 }
 
 func TestErrorExceptionMatches(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	PyErr_SetNone(PyExc_BufferError)
 
@@ -178,13 +178,13 @@ func TestErrorExceptionMatches(t *testing.T) {
 }
 
 func TestErrorGivenExceptionMatches(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	assert.True(t, PyErr_GivenExceptionMatches(PyExc_BufferError, PyExc_BufferError))
 }
 
 func TestErrorFetchRestore(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	PyErr_SetNone(PyExc_BufferError)
 
@@ -205,7 +205,7 @@ func TestErrorFetchRestore(t *testing.T) {
 }
 
 func TestErrorNormalizeExceptionRestore(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	PyErr_SetNone(PyExc_BufferError)
 
@@ -225,7 +225,7 @@ func TestErrorNormalizeExceptionRestore(t *testing.T) {
 }
 
 func TestErrorGetSetExcInfo(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	PyErr_SetNone(PyExc_BufferError)
 
@@ -247,7 +247,7 @@ func TestErrorInterrupt(t *testing.T) {
 	// reports "Signal 2 ignored due to race condition" instead of
 	// raising. The pre-3.12 assertion that PyErr_CheckSignals returns
 	// -1 no longer holds. We only assert the call does not crash.
-	Py_Initialize()
+	setupPy(t)
 
 	PyErr_SetInterrupt()
 	_ = PyErr_CheckSignals()

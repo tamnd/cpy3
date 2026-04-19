@@ -14,7 +14,7 @@ import (
 )
 
 func TestImportModule(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	os := PyImport_ImportModule("os")
 	assert.NotNil(t, os)
@@ -22,7 +22,7 @@ func TestImportModule(t *testing.T) {
 }
 
 func TestImportModuleEx(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	queue := PyImport_ImportModuleEx("queue", nil, nil, nil)
 	assert.NotNil(t, queue)
@@ -30,7 +30,7 @@ func TestImportModuleEx(t *testing.T) {
 }
 
 func TestImportModuleLevelObject(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	mathName := PyUnicode_FromString("math")
 	defer mathName.DecRef()
@@ -41,7 +41,7 @@ func TestImportModuleLevelObject(t *testing.T) {
 }
 
 func TestImportModuleLevel(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	sys := PyImport_ImportModuleLevel("sys", nil, nil, nil, 0)
 	assert.NotNil(t, sys)
@@ -49,7 +49,7 @@ func TestImportModuleLevel(t *testing.T) {
 }
 
 func TestImportImport(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	platformName := PyUnicode_FromString("platform")
 	defer platformName.DecRef()
@@ -60,7 +60,7 @@ func TestImportImport(t *testing.T) {
 }
 
 func TestReloadModule(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	os := PyImport_ImportModule("os")
 	assert.NotNil(t, os)
@@ -75,7 +75,7 @@ func TestReloadModule(t *testing.T) {
 }
 
 func TestAddModuleObject(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	os := PyImport_ImportModule("os")
 	assert.NotNil(t, os)
@@ -89,7 +89,7 @@ func TestAddModuleObject(t *testing.T) {
 }
 
 func TestAddModule(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	os := PyImport_ImportModule("os")
 	assert.NotNil(t, os)
@@ -100,7 +100,7 @@ func TestAddModule(t *testing.T) {
 }
 
 func TestExecCodeModule(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	// fake module
 	source := PyUnicode_FromString("__version__ = '2.0'")
@@ -127,7 +127,7 @@ func TestExecCodeModule(t *testing.T) {
 }
 
 func TestExecCodeModuleEx(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	// fake module
 	source := PyUnicode_FromString("__version__ = '2.0'")
@@ -154,7 +154,7 @@ func TestExecCodeModuleEx(t *testing.T) {
 }
 
 func TestExecCodeModuleWithPathnames(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	// fake module
 	source := PyUnicode_FromString("__version__ = '2.0'")
@@ -181,7 +181,7 @@ func TestExecCodeModuleWithPathnames(t *testing.T) {
 }
 
 func TestExecCodeModuleObject(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	// fake module
 	source := PyUnicode_FromString("__version__ = '2.0'")
@@ -211,21 +211,21 @@ func TestExecCodeModuleObject(t *testing.T) {
 }
 
 func TestGetMagicNumber(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	magicNumber := PyImport_GetMagicNumber()
 	assert.NotNil(t, magicNumber)
 }
 
 func TestGetMagicTag(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	magicTag := PyImport_GetMagicTag()
 	assert.NotNil(t, magicTag)
 }
 
 func TestGetModuleDict(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	// PyImport_GetModuleDict returns a borrowed reference.
 	moduleDict := PyImport_GetModuleDict()
@@ -234,7 +234,7 @@ func TestGetModuleDict(t *testing.T) {
 }
 
 func TestGetModule(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	os := PyImport_ImportModule("os")
 	assert.NotNil(t, os)
@@ -248,7 +248,7 @@ func TestGetModule(t *testing.T) {
 }
 
 func TestGetImporter(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	paths := PySys_GetObject("path")
 	path := PyList_GetItem(paths, 0)

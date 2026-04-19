@@ -7,7 +7,7 @@ import (
 )
 
 func TestUnicodeNew(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	s := PyUnicode_New(20, 'z')
 	assert.NotNil(t, s)
@@ -15,7 +15,7 @@ func TestUnicodeNew(t *testing.T) {
 }
 
 func TestUnicodeFromString(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	u := PyUnicode_FromString("aaa")
 	assert.True(t, PyUnicode_Check(u))
@@ -26,7 +26,7 @@ func TestUnicodeFromString(t *testing.T) {
 }
 
 func TestUnicodeFromEncodedObject(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	b := PyBytes_FromString("bbb")
 	assert.NotNil(t, b)
@@ -37,7 +37,7 @@ func TestUnicodeFromEncodedObject(t *testing.T) {
 }
 
 func TestUnicodeChar(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	u := PyUnicode_FromString("aaa")
 	assert.True(t, PyUnicode_Check(u))
@@ -50,7 +50,7 @@ func TestUnicodeChar(t *testing.T) {
 }
 
 func TestUnicodeFill(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	u := PyUnicode_FromString("aaa")
 	assert.True(t, PyUnicode_Check(u))
@@ -63,7 +63,7 @@ func TestUnicodeFill(t *testing.T) {
 }
 
 func TestUnicodeCopyCharacters(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	u := PyUnicode_FromString("aaa")
 	assert.True(t, PyUnicode_Check(u))
@@ -83,7 +83,7 @@ func TestUnicodeCopyCharacters(t *testing.T) {
 }
 
 func TestUnicodeSubstring(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	u := PyUnicode_FromString("aaa")
 	assert.True(t, PyUnicode_Check(u))

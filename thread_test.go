@@ -7,7 +7,7 @@ import (
 )
 
 func TestGIL(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	gil := PyGILState_Ensure()
 
@@ -17,7 +17,7 @@ func TestGIL(t *testing.T) {
 }
 
 func TestThreadState(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	threadState := PyGILState_GetThisThreadState()
 
@@ -31,7 +31,7 @@ func TestThreadState(t *testing.T) {
 }
 
 func TestThreadSaveRestore(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	threadState := PyEval_SaveThread()
 

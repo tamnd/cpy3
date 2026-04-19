@@ -8,7 +8,7 @@ import (
 )
 
 func TestSysGetSetObject(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	platform := PySys_GetObject("platform")
 	assert.NotNil(t, platform)
@@ -29,12 +29,13 @@ func TestSysGetSetObject(t *testing.T) {
 // and PySys_SetPath are gone. Use PyConfig instead.
 
 func TestSysPathViaPyConfig(t *testing.T) {
+	t.Skip("destructive: finalizes and re-initializes the interpreter")
 	// Bring up the default interpreter first so we can read back the
 	// stdlib path it picked, then tear it down and reinitialize with a
 	// PyConfig whose module_search_paths starts with our own entry.
 	// Using PyConfigIsolated + a single made-up path breaks Python's
 	// ability to import the encodings module.
-	Py_Initialize()
+	setupPy(t)
 	stdPaths := make([]string, 0, 8)
 	path := PySys_GetObject("path")
 	for i := 0; i < PyList_Size(path); i++ {

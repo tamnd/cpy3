@@ -7,7 +7,7 @@ import (
 )
 
 func TestRecursion(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	assert.Zero(t, Py_EnterRecursiveCall("in test function"))
 

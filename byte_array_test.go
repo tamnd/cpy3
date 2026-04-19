@@ -14,7 +14,7 @@ import (
 )
 
 func TestByteArrayCheck(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	s1 := "aaaaaaaa"
 
@@ -25,7 +25,7 @@ func TestByteArrayCheck(t *testing.T) {
 }
 
 func TestByteArrayFromAsString(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	s1 := "aaaaaaaa"
 
@@ -36,7 +36,7 @@ func TestByteArrayFromAsString(t *testing.T) {
 }
 
 func TestByteArrayConcat(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	s1 := "aaaaaaaa"
 	s2 := "bbbbbbbb"
@@ -59,7 +59,7 @@ func TestByteArrayConcat(t *testing.T) {
 }
 
 func TestByteArrayResize(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	s1 := "aaaaaaaa"
 
