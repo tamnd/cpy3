@@ -23,6 +23,12 @@ var initOnce sync.Once
 func setupPy(tb testing.TB) {
 	tb.Helper()
 	initOnce.Do(func() {
+		// If another test already initialized the interpreter (for
+		// example via Default in the modern-API tests), New has
+		// already released the GIL and there is nothing to do here.
+		if Py_IsInitialized() {
+			return
+		}
 		Py_Initialize()
 		// Py_Initialize leaves the GIL held on the calling thread.
 		// Release it so subsequent PyGILState_Ensure calls from other
