@@ -2,43 +2,66 @@ name: Test
 
 on:
   pull_request:
-    branches:
-      - master
+    branches: [master]
   push:
-    branches:
-      - master
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            go: '1.26'
+            python: '3.14'
+          - os: macos-14
+            go: '1.26'
+            python: '3.14'
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} / Go ${{ matrix.go }} / Python ${{ matrix.python }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-go@v3
+      - name: Set up Go
+        uses: actions/setup-go@v6
         with:
-          go-version: '1.18'
+          go-version: ${{ matrix.go }}
+          cache: true
 
-      - uses: actions/setup-python@v4
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.7'
+          python-version: ${{ matrix.python }}
 
-      - id: go-cache-paths
+      - name: Expose Python pkg-config
+        shell: bash
         run: |
-          echo "::set-output name=go-build::$(go env GOCACHE)"
-          echo "::set-output name=go-mod::$(go env GOMODCACHE)"
+          PY=python${{ matrix.python }}
+          PC_DIR=$($PY -c "import sysconfig, os; print(os.path.join(sysconfig.get_config_var('LIBPL') or sysconfig.get_config_var('LIBDIR'), 'pkgconfig'))")
+          if [ ! -f "$PC_DIR/python-${{ matrix.python }}-embed.pc" ]; then
+            PC_DIR=$($PY -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))")/pkgconfig
+          fi
+          echo "PKG_CONFIG_PATH=$PC_DIR:${PKG_CONFIG_PATH:-}" >> "$GITHUB_ENV"
+          echo "Using pkg-config dir: $PC_DIR"
+          ls -la "$PC_DIR" || true
 
-      - name: Go Build Cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.go-cache-paths.outputs.go-build }}
-          key: ${{ runner.os }}-go-build-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-go-build-
+      - name: Verify pkg-config resolves python-${{ matrix.python }}-embed
+        run: pkg-config --exists python-${{ matrix.python }}-embed && pkg-config --cflags --libs python-${{ matrix.python }}-embed
 
-      - name: Go Mod Cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.go-cache-paths.outputs.go-mod }}
-          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
-          restore-keys: ${{ runner.os }}-go-mod-
+      - name: Build
+        run: go build ./...
 
-      - run: go test ./... -cover
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -count=1 -cover ./...
