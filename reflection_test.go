@@ -7,7 +7,7 @@ import (
 )
 
 func TestReflectionBuiltins(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	builtins := PyEval_GetBuiltins()
 	assert.NotNil(t, builtins)
@@ -17,21 +17,21 @@ func TestReflectionBuiltins(t *testing.T) {
 }
 
 func TestReflectionLocals(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	locals := PyEval_GetLocals()
 	assert.Nil(t, locals)
 }
 
 func TestReflectionGlobals(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	globals := PyEval_GetGlobals()
 	assert.Nil(t, globals)
 }
 
 func TestReflectionFuncName(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	builtins := PyEval_GetBuiltins()
 	assert.NotNil(t, builtins)
@@ -42,7 +42,7 @@ func TestReflectionFuncName(t *testing.T) {
 	assert.Equal(t, "len", PyEval_GetFuncName(len))
 }
 func TestReflectionFuncDesc(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	builtins := PyEval_GetBuiltins()
 	assert.NotNil(t, builtins)

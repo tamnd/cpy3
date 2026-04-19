@@ -15,7 +15,7 @@ import (
 )
 
 func TestPyLongCheck(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	pyLong := PyLong_FromGoInt(345)
 	assert.True(t, PyLong_Check(pyLong))
@@ -24,7 +24,7 @@ func TestPyLongCheck(t *testing.T) {
 }
 
 func TestPyLongFromAsLong(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	v := 2354
 	pyLong := PyLong_FromLong(v)
 	assert.NotNil(t, pyLong)
@@ -33,7 +33,7 @@ func TestPyLongFromAsLong(t *testing.T) {
 }
 
 func TestPyLongFromAsUnsignedLong(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	v := uint(2354)
 	pyLong := PyLong_FromUnsignedLong(v)
 	assert.NotNil(t, pyLong)
@@ -42,7 +42,7 @@ func TestPyLongFromAsUnsignedLong(t *testing.T) {
 }
 
 func TestPyLongFromAsLongLong(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	v := int64(2354)
 	pyLong := PyLong_FromLongLong(v)
 	assert.NotNil(t, pyLong)
@@ -51,7 +51,7 @@ func TestPyLongFromAsLongLong(t *testing.T) {
 }
 
 func TestPyLongFromAsUnsignedLongLong(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	v := uint64(2354)
 	pyLong := PyLong_FromUnsignedLongLong(v)
 	assert.NotNil(t, pyLong)
@@ -60,7 +60,7 @@ func TestPyLongFromAsUnsignedLongLong(t *testing.T) {
 }
 
 func TestPyLongFromAsDouble(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	v := float64(2354.0)
 	pyLong := PyLong_FromDouble(v)
 	assert.NotNil(t, pyLong)
@@ -69,7 +69,7 @@ func TestPyLongFromAsDouble(t *testing.T) {
 }
 
 func TestPyLongFromAsGoFloat64(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	v := float64(2354.0)
 	pyLong := PyLong_FromGoFloat64(v)
 	assert.NotNil(t, pyLong)
@@ -78,7 +78,7 @@ func TestPyLongFromAsGoFloat64(t *testing.T) {
 }
 
 func TestPyLongFromAsString(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	v := 2354
 	s := strconv.Itoa(v)
 	pyLong := PyLong_FromString(s, 10)
@@ -88,7 +88,7 @@ func TestPyLongFromAsString(t *testing.T) {
 }
 
 func TestPyLongFromAsUnicodeObject(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	v := 2354
 	s := strconv.Itoa(v)
 	pyUnicode := PyUnicode_FromString(s)
@@ -101,7 +101,7 @@ func TestPyLongFromAsUnicodeObject(t *testing.T) {
 }
 
 func TestPyLongFromAsGoInt(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	v := 2354
 	pyLong := PyLong_FromGoInt(v)
 	assert.NotNil(t, pyLong)
@@ -110,7 +110,7 @@ func TestPyLongFromAsGoInt(t *testing.T) {
 }
 
 func TestPyLongFromAsGoUint(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	v := uint(2354)
 	pyLong := PyLong_FromGoUint(v)
 	assert.NotNil(t, pyLong)
@@ -119,7 +119,7 @@ func TestPyLongFromAsGoUint(t *testing.T) {
 }
 
 func TestPyLongFromAsGoInt64(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	v := int64(2354)
 	pyLong := PyLong_FromGoInt64(v)
 	assert.NotNil(t, pyLong)
@@ -128,7 +128,7 @@ func TestPyLongFromAsGoInt64(t *testing.T) {
 }
 
 func TestPyLongFromAsGoUint64(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 	v := uint64(2354)
 	pyLong := PyLong_FromGoUint64(v)
 	assert.NotNil(t, pyLong)

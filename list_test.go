@@ -7,7 +7,7 @@ import (
 )
 
 func TestList(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	list := PyList_New(0)
 	assert.True(t, PyList_Check(list))
@@ -62,7 +62,4 @@ func TestList(t *testing.T) {
 	assert.NotNil(t, world)
 
 	assert.Equal(t, "world", PyUnicode_AsUTF8(world))
-
-	PyList_ClearFreeList()
-
 }

@@ -8,7 +8,7 @@ import (
 )
 
 func TestModuleCheck(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	name := "test_module"
 
@@ -19,7 +19,7 @@ func TestModuleCheck(t *testing.T) {
 }
 
 func TestModuleNew(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	name := "test_module"
 
@@ -29,7 +29,7 @@ func TestModuleNew(t *testing.T) {
 }
 
 func TestModuleNewObject(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	name := "test_module"
 
@@ -43,7 +43,7 @@ func TestModuleNewObject(t *testing.T) {
 }
 
 func TestModuleGetDict(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	name := "sys"
 	pyName := PyUnicode_FromString(name)
@@ -57,7 +57,7 @@ func TestModuleGetDict(t *testing.T) {
 }
 
 func TestModuleGetName(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	name := "sys"
 	pyName := PyUnicode_FromString(name)
@@ -70,7 +70,7 @@ func TestModuleGetName(t *testing.T) {
 }
 
 func TestModuleGetNameObject(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	name := "sys"
 	pyName := PyUnicode_FromString(name)
@@ -83,7 +83,7 @@ func TestModuleGetNameObject(t *testing.T) {
 }
 
 func TestModuleGetState(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	name := "sys"
 	pyName := PyUnicode_FromString(name)
@@ -97,7 +97,7 @@ func TestModuleGetState(t *testing.T) {
 }
 
 func TestModuleGetFilenameObject(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	name := "queue"
 	queue := PyImport_ImportModule(name)

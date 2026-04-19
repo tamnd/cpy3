@@ -7,7 +7,7 @@ import (
 )
 
 func TestTupleCheck(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	tuple := PyTuple_New(0)
 	assert.True(t, PyTuple_Check(tuple))
@@ -16,7 +16,7 @@ func TestTupleCheck(t *testing.T) {
 }
 
 func TestTupleNew(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	tuple := PyTuple_New(0)
 	assert.NotNil(t, tuple)
@@ -24,7 +24,7 @@ func TestTupleNew(t *testing.T) {
 }
 
 func TestTupleSize(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	size := 45
 	tuple := PyTuple_New(size)
@@ -33,7 +33,7 @@ func TestTupleSize(t *testing.T) {
 }
 
 func TestTupleGetSetItem(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	s := PyUnicode_FromString("test")
 
@@ -49,7 +49,7 @@ func TestTupleGetSetItem(t *testing.T) {
 }
 
 func TestTupleGetSlice(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	s := PyUnicode_FromString("test")
 

@@ -7,13 +7,13 @@ import (
 )
 
 func TestWarnEx(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	assert.Zero(t, PyErr_WarnEx(PyExc_RuntimeWarning, "test warning", 3))
 }
 
 func TestWarnExplicitObject(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	message := PyUnicode_FromString("test warning")
 	defer message.DecRef()
@@ -28,7 +28,7 @@ func TestWarnExplicitObject(t *testing.T) {
 }
 
 func TestWarnExplicit(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	assert.Zero(t, PyErr_WarnExplicit(PyExc_RuntimeError, "test warning", "test.py", 4, "test_module", nil))
 }

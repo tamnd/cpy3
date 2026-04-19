@@ -7,7 +7,7 @@ import (
 )
 
 func TestTypeCheck(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	assert.True(t, PyType_Check(Type))
 	assert.True(t, PyType_CheckExact(Type))

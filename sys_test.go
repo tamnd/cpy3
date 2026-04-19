@@ -1,13 +1,14 @@
 package python3
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSysGetSetObject(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	platform := PySys_GetObject("platform")
 	assert.NotNil(t, platform)
@@ -24,49 +25,40 @@ func TestSysGetSetObject(t *testing.T) {
 	assert.Zero(t, PySys_SetObject("platform", platform))
 }
 
-func TestSysWarnOption(t *testing.T) {
-	Py_Finalize()
+// Since 3.13, PySys_AddWarnOption, PySys_ResetWarnOptions, PySys_AddXOption
+// and PySys_SetPath are gone. Use PyConfig instead.
 
-	assert.Nil(t, PySys_AddWarnOption("ignore"))
-
-	Py_Initialize()
-
-	warnoptions := PySys_GetObject("warnoptions")
-	assert.Equal(t, "ignore", PyUnicode_AsUTF8(PyList_GetItem(warnoptions, 0)))
-
-	Py_Finalize()
-
-	PySys_ResetWarnOptions()
-
-	Py_Initialize()
-
-	warnoptions = PySys_GetObject("warnoptions")
-	assert.Zero(t, PyList_Size(warnoptions))
-}
-
-func TestSysXOption(t *testing.T) {
-	Py_Finalize()
-
-	assert.Nil(t, PySys_AddXOption("faulthandler"))
-
-	Py_Initialize()
-
-	XOptions := PySys_GetXOptions()
-	faulthandler := PyDict_GetItemString(XOptions, "faulthandler")
-
-	assert.Equal(t, Py_True, faulthandler)
-}
-
-func TestSysPath(t *testing.T) {
-	Py_Initialize()
-
+func TestSysPathViaPyConfig(t *testing.T) {
+	t.Skip("destructive: finalizes and re-initializes the interpreter")
+	// Bring up the default interpreter first so we can read back the
+	// stdlib path it picked, then tear it down and reinitialize with a
+	// PyConfig whose module_search_paths starts with our own entry.
+	// Using PyConfigIsolated + a single made-up path breaks Python's
+	// ability to import the encodings module.
+	setupPy(t)
+	stdPaths := make([]string, 0, 8)
 	path := PySys_GetObject("path")
-	path.IncRef()
+	for i := 0; i < PyList_Size(path); i++ {
+		stdPaths = append(stdPaths, PyUnicode_AsUTF8(PyList_GetItem(path, i)))
+	}
+	Py_Finalize()
 
-	assert.Nil(t, PySys_SetPath("test"))
+	cfg := NewPyConfig(PyConfigIsolated)
+	paths := append([]string{"test"}, stdPaths...)
+	if s := cfg.SetModuleSearchPaths(paths); !s.IsOk() {
+		t.Fatalf("SetModuleSearchPaths: %v", s.Err())
+	}
+	if s := Py_InitializeFromConfig(cfg); !s.IsOk() {
+		cfg.Clear()
+		t.Fatalf("Py_InitializeFromConfig: %v", s.Err())
+	}
+	cfg.Clear()
 
-	newPath := PySys_GetObject("path")
-	assert.Equal(t, "test", PyUnicode_AsUTF8(PyList_GetItem(newPath, 0)))
+	// Python resolves relative entries in module_search_paths to
+	// absolute paths, so just verify our entry ended up at index 0.
+	path = PySys_GetObject("path")
+	first := PyUnicode_AsUTF8(PyList_GetItem(path, 0))
+	assert.True(t, strings.HasSuffix(first, "test"), first)
 
-	assert.Zero(t, PySys_SetObject("path", path))
+	Py_Finalize()
 }

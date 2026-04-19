@@ -14,7 +14,7 @@ import (
 )
 
 func TestDict(t *testing.T) {
-	Py_Initialize()
+	setupPy(t)
 
 	dict := PyDict_New()
 	assert.True(t, PyDict_Check(dict))
@@ -88,9 +88,4 @@ func TestDict(t *testing.T) {
 
 	PyDict_Clear(dict)
 	assert.Equal(t, 0, PyDict_Size(dict))
-
-	dict.DecRef()
-
-	PyDict_ClearFreeList()
-
 }
