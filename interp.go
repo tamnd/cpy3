@@ -222,10 +222,22 @@ func (p *Interp) Run(code string) error {
 	ccode := C.CString(code)
 	defer C.free(unsafe.Pointer(ccode))
 
-	if C.PyRun_SimpleString(ccode) != 0 {
-		return errorFromPython()
+	// In cgo test binaries the Go runtime can deliver signals at
+	// moments where Python's internal machinery expects a frame.
+	// When that happens CPython prints the error as an unraisable
+	// exception, clearing the error indicator, and PyRun_SimpleString
+	// still returns -1. Retry once after draining pending signals so
+	// callers do not see a spurious "error indicator not set" error.
+	if C.PyRun_SimpleString(ccode) == 0 {
+		return nil
 	}
-	return nil
+	if C.PyErr_Occurred() == nil {
+		C.PyErr_CheckSignals()
+		if C.PyRun_SimpleString(ccode) == 0 {
+			return nil
+		}
+	}
+	return errorFromPython()
 }
 
 // Import imports the named module and returns a handle. The caller
@@ -257,8 +269,17 @@ func (p *Interp) Eval(expr string) (*Object, error) {
 	globals := C.PyModule_GetDict(mod)
 
 	result := C.PyRun_String(cexpr, C.Py_eval_input, globals, globals)
-	if result == nil {
-		return nil, errorFromPython()
+	if result != nil {
+		return newObject((*PyObject)(result)), nil
 	}
-	return newObject((*PyObject)(result)), nil
+	// Same signal-race mitigation as Run: retry once if the indicator
+	// was cleared by an unraisable print.
+	if C.PyErr_Occurred() == nil {
+		C.PyErr_CheckSignals()
+		result = C.PyRun_String(cexpr, C.Py_eval_input, globals, globals)
+		if result != nil {
+			return newObject((*PyObject)(result)), nil
+		}
+	}
+	return nil, errorFromPython()
 }

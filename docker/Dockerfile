@@ -19,6 +19,9 @@ FROM ubuntu:24.04 AS builder
 
 ARG PYTHON_VERSION
 ARG GO_VERSION
+# TARGETARCH is injected by BuildKit (amd64, arm64, ...); used to pick
+# the matching Go tarball so the image builds natively on either arch.
+ARG TARGETARCH
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -40,8 +43,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Go 1.26.
-RUN curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" \
+# Install Go 1.26 matching the build host's architecture.
+RUN curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-${TARGETARCH}.tar.gz" \
         -o /tmp/go.tgz \
     && tar -C /usr/local -xzf /tmp/go.tgz \
     && rm /tmp/go.tgz
