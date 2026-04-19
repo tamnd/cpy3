@@ -88,9 +88,4 @@ func TestDict(t *testing.T) {
 
 	PyDict_Clear(dict)
 	assert.Equal(t, 0, PyDict_Size(dict))
-
-	dict.DecRef()
-
-	PyDict_ClearFreeList()
-
 }

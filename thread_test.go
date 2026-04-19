@@ -6,18 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestThreadInitialization(t *testing.T) {
-	Py_Initialize()
-	PyEval_InitThreads()
-
-	assert.True(t, PyEval_ThreadsInitialized())
-
-	PyEval_ReInitThreads()
-}
-
 func TestGIL(t *testing.T) {
 	Py_Initialize()
-	PyEval_InitThreads()
 
 	gil := PyGILState_Ensure()
 
@@ -28,7 +18,6 @@ func TestGIL(t *testing.T) {
 
 func TestThreadState(t *testing.T) {
 	Py_Initialize()
-	PyEval_InitThreads()
 
 	threadState := PyGILState_GetThisThreadState()
 
@@ -43,12 +32,10 @@ func TestThreadState(t *testing.T) {
 
 func TestThreadSaveRestore(t *testing.T) {
 	Py_Initialize()
-	PyEval_InitThreads()
 
 	threadState := PyEval_SaveThread()
 
 	assert.False(t, PyGILState_Check())
 
 	PyEval_RestoreThread(threadState)
-
 }

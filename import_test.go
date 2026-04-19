@@ -227,11 +227,10 @@ func TestGetMagicTag(t *testing.T) {
 func TestGetModuleDict(t *testing.T) {
 	Py_Initialize()
 
+	// PyImport_GetModuleDict returns a borrowed reference.
 	moduleDict := PyImport_GetModuleDict()
-	defer moduleDict.DecRef()
 
 	assert.True(t, PyDict_Check(moduleDict))
-
 }
 
 func TestGetModule(t *testing.T) {
