@@ -1,64 +1,122 @@
-# Go bindings for the CPython-3 C-API
+# cpy3 — CPython 3.14 bindings for Go
 
-**Currently supports python-3.7 only.**
+[![Go Reference](https://pkg.go.dev/badge/github.com/tamnd/cpy3.svg)](https://pkg.go.dev/github.com/tamnd/cpy3)
 
-This package provides a ``go`` package named "python" under which most of the
-``PyXYZ`` functions and macros of the public C-API of CPython have been
-exposed. Theoretically, you should be able use https://docs.python.org/3/c-api
-and know what to type in your ``go`` program.
+`cpy3` is a maintained fork of the [`go-python/cpy3`](https://github.com/go-python/cpy3) bindings, updated for CPython 3.14 and with an idiomatic Go API layer on top.
 
-## relation to `DataDog/go-python3`
+Two layers, same package:
 
-This project is a community maintained successor to [`DataDog/go-python3`](https://github.com/DataDog/go-python3), which will get archived in December 2021.
+- **Thin C-API wrappers** — one Go function per public `Py*_*` C function. Use these when you need something the high-level layer does not cover.
+- **Idiomatic Go API** — an `Interp` handle, an owning `Object` type with `Close`, typed `Error` values with `errors.Unwrap` chaining, `FromGo` / `ToGo[T]` conversions, and a `python3.Acquire` helper that pins the goroutine and holds the GIL in one call.
 
-- If you use the Go package `github.com/DataDog/go-python3` in your code, you can use `github.com/go-python/cpy3` as a drop-in replacement. We intend to not introduce breaking changes.
-- If you have unmerged PRs or open issues on `DataDog/go-python3`, please re-submit them here.
+## Install
 
-## relation to `sbinet/go-python`
+Requires Go 1.23+ and CPython 3.14.0+ with `python-3.14-embed.pc` reachable from `pkg-config` (Homebrew `python@3.14` on macOS, `python3.14-dev` on Debian).
 
-This project was inspired by [`sbinet/go-python`](https://github.com/sbinet/go-python) (Go bindings for the CPython-2 C-API).
+```bash
+go get github.com/tamnd/cpy3
+```
 
-# Install
+## Quick start
 
-## Deps
+```go
+package main
 
-We will need `pkg-config` and a working `python3.7` environment to build these
-bindings. Make sure you have Python libraries and header files installed as
-well (`python3.7-dev` on Debian or `python3-devel` on Centos for example)..
+import (
+    "fmt"
 
-By default `pkg-config` will look at the `python3` library so if you want to
-choose a specific version just symlink `python-X.Y.pc` to `python3.pc` or use
-the `PKG_CONFIG_PATH` environment variable.
+    python3 "github.com/tamnd/cpy3"
+)
 
-## Go get
+func main() {
+    p := python3.Default()
 
-Then simply `go get github.com/go-python/cpy3`
+    if err := p.Run("x = 6 * 7"); err != nil {
+        panic(err)
+    }
 
-# API
+    v, err := p.Eval("x")
+    if err != nil {
+        panic(err)
+    }
+    defer python3.Acquire()()
+    defer v.Close()
 
-Some functions mix go code and call to Python function. Those functions will
-return and `int` and `error` type. The `int` represent the Python result code
-and the `error` represent any issue from the Go layer.
+    got, _ := python3.ToGo[int](v)
+    fmt.Println(got) // 42
+}
+```
 
-Example:
+## GIL rules
 
-`func PyRun_AnyFile(filename string)` open `filename` and then call CPython API
-function `int PyRun_AnyFile(FILE *fp, const char *filename)`.
+Python 3.12 made every `Py_*` call from a thread that does not hold the GIL a hard abort. Go freely migrates goroutines across OS threads, so any Go code that touches the C API has to pin its goroutine and hold the GIL.
 
-Therefore its signature is `func PyRun_AnyFile(filename string) (int, error)`,
-the `int` represent the error code from the CPython `PyRun_AnyFile` function
-and error will be set if we failed to open `filename`.
+Use `Acquire`:
 
-If an error is raise before calling th CPython function `int` default to `-1`.
+```go
+defer python3.Acquire()()
+// safe to call Object methods and thin C-API wrappers here
+```
 
-Take a look at some [examples](examples) and this [tutorial blogpost](https://poweruser.blog/embedding-python-in-go-338c0399f3d5).
+`Interp.Run`, `Interp.Import`, and `Interp.Eval` already do this internally. You only need `Acquire` when you read back Object methods or call `ToGo` after one of those returns.
 
-# Contributing
+## Error handling
 
-Contributions are welcome! See [details](CONTRIBUTING.md).  
+Python exceptions come back as `*python3.Error` with `Type`, `Message`, and a `Cause` chain built from `__cause__` / `__context__`:
 
+```go
+_, err := p.Eval("1/0")
+if err != nil {
+    var pyErr *python3.Error
+    if errors.As(err, &pyErr) {
+        fmt.Println(pyErr.Type)    // "builtins.ZeroDivisionError"
+        fmt.Println(pyErr.Message) // "division by zero"
+    }
+}
+```
 
-# Community
-Find us in [`#go-python`](https://gophers.slack.com/archives/C4FDJLLET) on [Gophers Slack](https://gophers.slack.com). ([infos](https://blog.gopheracademy.com/gophers-slack-community/) | [invite](https://invite.slack.golangbridge.org/))  
-  
-This project follows the [Go Community Code of Conduct](https://golang.org/conduct).
+`python3.IsPyException(err)` is a convenience over `errors.As`.
+
+## Calling into Python
+
+```go
+defer python3.Acquire()()
+
+builtins, _ := p.Import("builtins")
+defer builtins.Close()
+
+length, _ := builtins.GetAttr("len")
+defer length.Close()
+
+arg, _ := python3.FromGo("hello")
+defer arg.Close()
+
+res, _ := length.Call(arg)
+defer res.Close()
+
+n, _ := python3.ToGo[int](res)
+fmt.Println(n) // 5
+```
+
+## Thin C-API layer
+
+Everything under the thin layer is named after its CPython counterpart and documented inline with a link to the CPython docs. You can drop down whenever the idiomatic surface does not cover a call:
+
+```go
+defer python3.Acquire()()
+mod := python3.PyImport_ImportModule("math")
+defer mod.DecRef()
+pi := mod.GetAttrString("pi")
+defer pi.DecRef()
+fmt.Println(python3.PyFloat_AsDouble(pi))
+```
+
+## Status
+
+Passes `go test ./...` against CPython 3.14 on macOS (arm64) and Linux (amd64 / arm64), GIL build. Free-threaded (`python3.14t`) build is in scope but gated behind a build tag.
+
+See [`spec/0960_cpy3.md`](spec/0960_cpy3.md) for the full upgrade and API-layer design.
+
+## License
+
+MIT. See [`LICENSE`](LICENSE).
